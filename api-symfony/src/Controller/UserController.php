@@ -172,25 +172,67 @@ class UserController extends AbstractController
 		// metodo para comprpbar token
 		$auth = $jwtAuth->checkToken($token);
 
+		// Respuesta por defecto
+		$data = [
+			'status' => 'error',
+			'code' => JsonResponse::HTTP_BAD_REQUEST,
+			'message' => 'No se pueden actualizar los datos.'
+		];
+
 		// si es correcto actualizar datos
 		if ($auth) {
 			// Actualizar user
 			// Conseguir entity manager
-			// Obtener datos del usuario identificado
-			// Conseguir el usuario a actualizar
-			// Recoger datos post
-			// Comprobar y validar datos
-			// Asignar datos nuevos
-			// Comprobar duplicados
-			// Guardar cambios
-		}
+			$em = $this->getDoctrine()->getManager();
 
-		$data = [
-			'status' => 'error',
-			'code' => JsonResponse::HTTP_BAD_REQUEST,
-			'message' => 'Metodo edit',
-			'token' => $auth
-		];
+			// Obtener datos del usuario identificado
+			$identity = $jwtAuth->checkToken($token, true);
+			// Conseguir el usuario a actualizar
+			$user_repo = $this->getDoctrine()->getRepository(User::class);
+			$user = $user_repo->findOneBy(['id' => $identity->sub]);
+
+			// Recoger datos post
+			$json = $req->get('json', null);
+			$params = json_decode($json);
+
+			// Comprobar y validar datos
+			if (!empty($json)) {
+				$name = !empty($params->name) ? $params->name : null;
+				$lastname = !empty($params->lastname) ? $params->lastname : null;
+				$email = !empty($params->email) ? $params->email : null;
+
+				$validator = Validation::createValidator();
+				$validate_email = $validator->validate($email, [new Email()]);
+
+				if (
+					!empty($email) &&
+					count($validate_email) == 0 &&
+					!empty($name) &&
+					!empty($lastname)
+				) {
+					// Asignar datos nuevos
+
+					$user->setName($name);
+					$user->setLastname($lastname);
+					$user->setEmail($email);
+
+					// Comprobar duplicados
+					$isset_user = $user_repo->findBy(['email' => $email]);
+					if (count($isset_user) == 0 || strcasecmp($identity->email, $email)) {
+						// Guardar cambios
+						$em->persist($user);
+						$em->flush();
+
+						$data['status'] = 'ok';
+						$data['code'] = JsonResponse::HTTP_OK;
+						$data['message'] = 'Usuario actualizado correctamente';
+						$data['user'] = $user;
+					} else {
+						$data['message'] = 'El email ya esta en uso.';
+					}
+				}
+			}
+		}
 
 		return new JsonResponse($data, $data['code']);
 	}
