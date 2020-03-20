@@ -12,6 +12,8 @@ use App\Entity\Video;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Validation;
 
+use App\Services\JwtAuth;
+
 class UserController extends AbstractController
 {
 	public function index()
@@ -112,6 +114,85 @@ class UserController extends AbstractController
 		}
 
 		return new JsonResponse($data, JsonResponse::HTTP_BAD_REQUEST);
+	}
+
+	public function login(Request $req, JwtAuth $jwtAuth)
+	{
+		// REspuesta por defecto
+		$data = [
+			'status' => 'error',
+			'code' => JsonResponse::HTTP_BAD_REQUEST,
+			'message' => 'Las credenciales no son validas.'
+		];
+
+		// Recibir datos
+		$json = $req->get('json', null);
+		$params = json_decode($json);
+
+		// Comprobar y validar datos
+		if ($json) {
+			$email = !empty($params->email) ? $params->email : null;
+			$password = !empty($params->password) ? $params->password : null;
+			$getToken = !empty($params->token) ? $params->token : null;
+
+			$validator = Validation::createValidator();
+			$validate_email = $validator->validate($email, [new Email()]);
+
+			if (!empty($email) && !empty($password) && count($validate_email) == 0) {
+				// Cifrar password
+				$password = hash('sha256', $password);
+				// Si es valido , llamar servicio para identificar user con jwt
+				if ($getToken) {
+					$signup = $jwtAuth->signUp($email, $password, $getToken);
+				} else {
+					$signup = $jwtAuth->signUp($email, $password);
+				}
+
+				// si todo va bien respuesta
+				if ($signup == 'error') {
+					$data['status'] = 'error';
+					$data['message'] = 'Error al iniciar sesion.';
+				} else {
+					$data['status'] = 'ok';
+					$data['code'] = JsonResponse::HTTP_OK;
+					$data['data'] = $signup;
+					unset($data['message']);
+				}
+			}
+		}
+
+		return new JsonResponse($data, $data['code']);
+	}
+
+	public function edit(Request $req, JwtAuth $jwtAuth)
+	{
+		// Recoger cabecera de autenticacion
+		$token = $req->headers->get('Authorization');
+
+		// metodo para comprpbar token
+		$auth = $jwtAuth->checkToken($token);
+
+		// si es correcto actualizar datos
+		if ($auth) {
+			// Actualizar user
+			// Conseguir entity manager
+			// Obtener datos del usuario identificado
+			// Conseguir el usuario a actualizar
+			// Recoger datos post
+			// Comprobar y validar datos
+			// Asignar datos nuevos
+			// Comprobar duplicados
+			// Guardar cambios
+		}
+
+		$data = [
+			'status' => 'error',
+			'code' => JsonResponse::HTTP_BAD_REQUEST,
+			'message' => 'Metodo edit',
+			'token' => $auth
+		];
+
+		return new JsonResponse($data, $data['code']);
 	}
 
 	private function resJson($data)
