@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+//use JsonSerializable;
 
 /**
  * Video
@@ -10,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="videos", indexes={@ORM\Index(name="fk_video_user", columns={"user_id"})})
  * @ORM\Entity
  */
-class Video
+class Video //implements JsonSerializable
 {
 	/**
 	 * @var int
@@ -161,4 +162,18 @@ class Video
 
 		return $this;
 	}
+
+	/* public function jsonSerialize()
+	{
+		return [
+			'id' => $this->id,
+			'title' => $this->title,
+			'description' => $this->description,
+			'url' => $this->url,
+			'status' => $this->status,
+			'createdAt' => $this->createdAt,
+			'updatedAt' => $this->updatedAt,
+			'user' => $this->user
+		];
+	} */
 }

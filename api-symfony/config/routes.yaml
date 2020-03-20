@@ -5,3 +5,8 @@
 user:
     path: /user
     controller: App\Controller\UserController::index
+
+register:
+    path: /register
+    controller: App\Controller\UserController::create
+    methods: [POST]
