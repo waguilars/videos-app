@@ -142,6 +142,52 @@ class VideoController extends AbstractController
 		return $this->resJson($data);
 	}
 
+	public function detail(Request $req, JwtAuth $jwtAuth, $id = null)
+	{
+		$data = [
+			'status' => 'error',
+			'code' => JsonResponse::HTTP_NOT_FOUND,
+			'message' => 'No se ha podido encontrar en video.'
+		];
+
+		// Recoger token
+		$token = $req->headers->get('Authorization');
+
+		// comprobar token
+		$auth = $jwtAuth->checkToken($token);
+
+		// Si es valido Obtener identity
+		if (!$auth || empty($token)) {
+			$data['code'] = JsonResponse::HTTP_UNAUTHORIZED;
+			$data['message'] = 'Necesita iniciar sesion para realizar esta accion.';
+
+			return new JsonResponse($data, $data['code']);
+		}
+
+		// sacar identidad de user
+		$identity = $jwtAuth->checkToken($token, true);
+
+		// sacar video en base a id
+		$video = $this->getDoctrine()
+			->getRepository(Video::class)
+			->findOneBy([
+				'id' => $id,
+				'user' => $identity->sub
+			]);
+
+		// comprobar si video pertenece al user
+		if ($video && is_object($video)) {
+			// devovler respuesta
+			$data['status'] = 'ok';
+			$data['code'] = JsonResponse::HTTP_OK;
+			$data['video'] = $video;
+			unset($data['message']);
+
+			return $this->resJson($data);
+		}
+		return new JsonResponse($data, $data['code']);
+	}
+
 	private function resJson($data)
 	{
 		// Serializar datos con serializer

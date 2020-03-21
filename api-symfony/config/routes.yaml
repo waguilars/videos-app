@@ -32,3 +32,8 @@ video_list:
     path: /video/list
     controller: App\Controller\VideoController::list
     methods: [GET]
+
+video_detail:
+    path: /video/detail/{id}
+    controller: App\Controller\VideoController::detail
+    methods: [GET]
