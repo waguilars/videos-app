@@ -190,7 +190,11 @@ class UserController extends AbstractController
 			// Conseguir el usuario a actualizar
 			$user_repo = $this->getDoctrine()->getRepository(User::class);
 			$user = $user_repo->findOneBy(['id' => $identity->sub]);
-
+			if (!$user) {
+				$data['message'] = 'El usuario no existe';
+				$data['code'] = JsonResponse::HTTP_NOT_FOUND;
+				return new JsonResponse($data, $data['code']);
+			}
 			// Recoger datos post
 			$json = $req->get('json', null);
 			$params = json_decode($json);
@@ -218,7 +222,8 @@ class UserController extends AbstractController
 
 					// Comprobar duplicados
 					$isset_user = $user_repo->findBy(['email' => $email]);
-					if (count($isset_user) == 0 || strcasecmp($identity->email, $email)) {
+
+					if (count($isset_user) == 0 || strcasecmp($identity->email, $email) == 0) {
 						// Guardar cambios
 						$em->persist($user);
 						$em->flush();

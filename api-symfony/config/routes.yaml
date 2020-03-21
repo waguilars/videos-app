@@ -20,3 +20,10 @@ user_edit:
     path: /user/edit
     controller: App\Controller\UserController::edit
     methods: [PUT]
+
+# Rutas del controlador video
+
+new_video:
+    path: /video/new
+    controller: App\Controller\VideoController::new
+    methods: [POST]
