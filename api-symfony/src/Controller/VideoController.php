@@ -9,9 +9,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 use App\Entity\User;
 use App\Entity\Video;
-use Symfony\Component\Validator\Constraints\Email;
-use Symfony\Component\Validator\Validation;
 
+use Knp\Component\Pager\PaginatorInterface;
 use App\Services\JwtAuth;
 
 class VideoController extends AbstractController
@@ -84,6 +83,61 @@ class VideoController extends AbstractController
 				$data['code'] = JsonResponse::HTTP_CREATED;
 			}
 		}
+
+		return $this->resJson($data);
+	}
+
+	public function list(Request $req, JwtAuth $jwtAuth, PaginatorInterface $paginator)
+	{
+		$data = [
+			'status' => 'error',
+			'code' => JsonResponse::HTTP_BAD_REQUEST,
+			'message' => 'No se ha podido completar la solicitud.'
+		];
+
+		// Recoger token
+		$token = $req->headers->get('Authorization');
+
+		// comprobar token
+		$auth = $jwtAuth->checkToken($token);
+
+		// Si es valido Obtener identity
+		if (!$auth || empty($token)) {
+			$data['code'] = JsonResponse::HTTP_UNAUTHORIZED;
+			$data['message'] = 'Necesita iniciar sesion para realizar esta accion.';
+
+			return new JsonResponse($data, $data['code']);
+		}
+
+		// Configurar bundle de paginacion
+		$identity = $jwtAuth->checkToken($token, true);
+
+		$em = $this->getDoctrine()->getManager();
+
+		// Consulta para paginar
+		$dql = "SELECT v FROM App\Entity\Video v WHERE v.user = {$identity->sub} ORDER BY v.id DESC";
+
+		$query = $em->createQuery($dql);
+
+		// Recoger parametro page de paginacion
+		$page = $req->query->getInt('page', 1);
+		$items_per_page = 5;
+
+		// invocar paginacion
+		$pagination = $paginator->paginate($query, $page, $items_per_page);
+		$total = $pagination->getTotalItemCount();
+
+		// devolver respuesta
+		$data['status'] = 'ok';
+		$data['code'] = JsonResponse::HTTP_OK;
+		unset($data['message']);
+
+		$data['totalItems'] = $total;
+		$data['page'] = $page;
+		$data['pageItems'] = $items_per_page;
+		$data['totalPages'] = ceil($total / $items_per_page);
+		$data['videos'] = $pagination;
+		$data['user'] = $identity->sub;
 
 		return $this->resJson($data);
 	}

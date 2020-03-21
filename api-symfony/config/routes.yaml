@@ -27,3 +27,8 @@ new_video:
     path: /video/new
     controller: App\Controller\VideoController::new
     methods: [POST]
+
+video_list:
+    path: /video/list
+    controller: App\Controller\VideoController::list
+    methods: [GET]
