@@ -28,6 +28,11 @@ new_video:
     controller: App\Controller\VideoController::new
     methods: [POST]
 
+update_video:
+    path: /video/update/{id}
+    controller: App\Controller\VideoController::new
+    methods: [PUT]
+
 video_list:
     path: /video/list
     controller: App\Controller\VideoController::list
@@ -37,3 +42,8 @@ video_detail:
     path: /video/detail/{id}
     controller: App\Controller\VideoController::detail
     methods: [GET]
+
+video_delete:
+    path: /video/delete/{id}
+    controller: App\Controller\VideoController::delete
+    methods: [DELETE]
