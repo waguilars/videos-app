@@ -6,6 +6,7 @@ export class User {
     public password: string;
     public role: string;
     public createdAt: Date;
+    public token: boolean;
 
     constructor() {
         this.id = null;
@@ -15,5 +16,6 @@ export class User {
         this.password = '';
         this.role = 'ROLE_USER';
         this.createdAt = null;
+        this.token = false;
     }
 }
