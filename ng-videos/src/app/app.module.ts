@@ -9,6 +9,8 @@ import { LoginComponent } from './components/login/login.component';
 import { AppRoutingModule } from './app.routing';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { UserEditComponent } from './components/user-edit/user-edit.component';
+import { VideoNewComponent } from './components/video-new/video-new.component';
 
 @NgModule({
     declarations: [
@@ -16,7 +18,9 @@ import { HttpClientModule } from '@angular/common/http';
         HomeComponent,
         ErrorComponent,
         RegisterComponent,
-        LoginComponent
+        LoginComponent,
+        UserEditComponent,
+        VideoNewComponent
     ],
     imports: [
         BrowserModule,

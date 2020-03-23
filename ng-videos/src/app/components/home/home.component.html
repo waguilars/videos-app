@@ -1,2 +1,22 @@
-<h2>{{titlePage}}</h2>
-<hr />
+<div class="" *ngIf="identity">
+
+    <h2>{{titlePage}}</h2>
+    <hr />
+</div>
+
+<div class="" *ngIf="!identity">
+    <div class="jumbotron">
+        <h1 class="display-4">Bienvenido a tu pagina de videos favoritos!</h1>
+        <p class="lead">Registrate para poder empezar a distrutar de este servicio.</p>
+        <hr class="my-4">
+
+        <p class="lead">
+            <a class="btn btn-success btn-lg" [routerLink]="['/login']" role="button">
+                Login
+            </a>
+            <a class="btn btn-warning btn-lg ml-4" [routerLink]="['/registro']" role="button">
+                Registro
+            </a>
+        </p>
+    </div>
+</div>
