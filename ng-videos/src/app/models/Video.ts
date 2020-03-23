@@ -7,9 +7,10 @@ export class Video {
     public status: string;
     public createdAT: Date;
     public updatedAT: Date;
-    constructor() {
+
+    constructor(userID: number, ) {
         this.id = null;
-        this.userId = null;
+        this.userId = userID;
         this.title = '';
         this.description = '';
         this.url = '';
