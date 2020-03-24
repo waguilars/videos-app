@@ -1,3 +1,4 @@
+import { User } from './User';
 export class Video {
     public id: number;
     public userId: number;
@@ -7,6 +8,7 @@ export class Video {
     public status: string;
     public createdAT: Date;
     public updatedAT: Date;
+    public user: User;
 
     constructor(userID: number, ) {
         this.id = null;
@@ -17,6 +19,7 @@ export class Video {
         this.status = '';
         this.createdAT = null;
         this.updatedAT = null;
+        this.user = null;
 
     }
 }
